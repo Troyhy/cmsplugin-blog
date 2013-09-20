@@ -78,6 +78,8 @@ class Entry(models.Model):
         except Title.DoesNotExist:
             # Blog app hook not defined anywhere?
             pass
+        except Title.MultipleObjectsReturned:
+            title = Title.objects.filter(application_urls='BlogApphook', language=language)[0]
 
         ret = blog_prefix or reverse('pages-root')
         activate(old_lang)
@@ -92,7 +94,7 @@ class Entry(models.Model):
     class Meta:
         verbose_name = _('entry')
         verbose_name_plural = _('entries')
-        ordering = ('-pub_date', )
+        ordering = ('-pub_date',)
 
 tagging.register(Entry, tag_descriptor_attr='entry_tags')
 
@@ -120,7 +122,7 @@ class AbstractEntryTitle(models.Model):
 
     class Meta:
         unique_together = ('language', 'slug')
-        abstract=True
+        abstract = True
     
 class EntryTitle(AbstractEntryTitle):
     
@@ -133,7 +135,7 @@ class LatestEntriesPlugin(CMSPlugin):
     """
         Model for the settings when using the latest entries cms plugin
     """
-    limit = models.PositiveIntegerField(_('Number of entries items to show'), 
+    limit = models.PositiveIntegerField(_('Number of entries items to show'),
                     help_text=_('Limits the number of items that will be displayed'))
                     
     current_language_only = models.BooleanField(_('Only show entries for the current language'))
