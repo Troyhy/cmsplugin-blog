@@ -11,6 +11,7 @@ from cms.utils.urlutils import urljoin
 from cms.models import CMSPlugin, Title
 
 import tagging
+from simple_translation.utils import get_preferred_translation_from_lang
 from tagging.fields import TagField
 
 from simple_translation.actions import SimpleTranslationPlaceholderActions
@@ -84,7 +85,15 @@ class Entry(models.Model):
         ret = blog_prefix or reverse('pages-root')
         activate(old_lang)
         return ret
-        
+
+    def __unicode__(self):
+        try:
+            title = Title.objects.filter(application_urls='BlogApphook')[0]
+        except Exception:
+           return u'No Title'
+
+        return u'{} {}'.format(self.pub_date, get_preferred_translation_from_lang(self, 'en'))
+
     def _template(self):
         from simple_translation.utils import get_translated_model
         model = get_translated_model(self.__class__)
